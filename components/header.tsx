@@ -1,3 +1,7 @@
+"use client"
+
+import Link from "next/link";
+
 interface HeaderProps {
   title?: string
 }
@@ -9,9 +13,11 @@ export function Header({ title = 'Users Management' }: HeaderProps) {
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 hidden lg:block">{title}</h1>
       </div>
+      <Link href="/dashboard/settings" >
       <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:shadow-lg transition">
         👤
       </div>
+      </Link>
     </header>
   )
 }

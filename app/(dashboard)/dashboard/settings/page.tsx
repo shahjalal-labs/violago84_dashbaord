@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import { Header } from '@/components/header';
 import { SettingsTabs } from '@/components/pages/dashboard/settings/settings-tabs';
-import { BasicSettingsPanel } from '@/components/pages/dashboard/settings/basic-settings-panel';
 import { AccountSettingsPanel } from '@/components/pages/dashboard/settings/account-settings-panel';
-
+import { BasicSettingsPanel } from '@/components/pages/dashboard/settings/basic-settings-panel';
 
 export type SettingsTab = 'basic' | 'account';
 

@@ -3,6 +3,31 @@
 
 import { baseApi } from "../api/baseApi";
 
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  fullName: string;
+  phoneNumber?: string;
+  profileImage?: string;
+  role: string;
+  status: string;
+  isProfileCompleted: boolean;
+  country: string;
+  city: string;
+  profile?: {
+    puppyName: string;
+    DOB: string;
+    ageGroup: string;
+    gender: 'MALE' | 'FEMALE';
+    breedType: string;
+    trainingReminder: boolean;
+    trainingReminderTime?: string;
+  };
+}
+
+
+
 const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUSers: builder.query({
@@ -39,7 +64,20 @@ const usersApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["user"],
     }),
-
+  getMe: builder.query<UserProfile, void>({
+      query: () => '/auth/get-me',
+      transformResponse: (response: any) => response.data,
+      providesTags: ['user'],
+    }),
+    updateUser: builder.mutation<UserProfile, FormData>({
+      query: (formData) => ({
+        url: '/users/update-user',
+        method: 'PATCH',
+        body: formData,
+      }),
+      invalidatesTags: ['user'],
+    }),
+ 
   }),
 });
 
@@ -47,4 +85,6 @@ export const {
   useGetAllUSersQuery,
   useGetSingleUserQuery,
   useBlockUnblockUserMutation,
+  useGetMeQuery,
+  useUpdateUserMutation
 } = usersApi;

@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Select } from 'antd';
-import { Pencil, Info } from 'lucide-react';
+import { Select, message } from 'antd';
+import { Pencil, Info, Loader2 } from 'lucide-react';
+import { useGetMeQuery, useUpdateUserMutation } from '@/redux/features/usersApi';
 
 const COUNTRIES = ['USA', 'UK', 'Canada', 'Australia', 'Bangladesh', 'India', 'Germany'];
 
@@ -29,7 +31,11 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function BasicSettingsPanel() {
+  const { data: userData, isLoading: isLoadingUser, refetch } = useGetMeQuery();
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+
   const [photoUrl, setPhotoUrl] = useState('/shepherd-1.png');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -38,15 +44,30 @@ export function BasicSettingsPanel() {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      displayName: 'Bryan Adams',
+      displayName: '',
       country: 'USA',
       city: 'New York',
     },
   });
+
+  // Load user data when API returns
+  useEffect(() => {
+    if (userData) {
+      reset({
+        displayName: userData.fullName || '',
+        country: userData?.country || 'USA',
+        city: userData.city || 'New York',
+      });
+      if (userData.profileImage) {
+        setPhotoUrl(userData.profileImage);
+      }
+    }
+  }, [userData, reset]);
 
   const selectedCountry = watch('country');
   const cities = CITIES_BY_COUNTRY[selectedCountry] || [];
@@ -54,15 +75,38 @@ export function BasicSettingsPanel() {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file?.type.startsWith('image/')) {
+      setPhotoFile(file);
       setPhotoUrl(URL.createObjectURL(file));
     }
   };
 
-  const onSubmit = (data: FormData) => {
-    console.log('Saved:', data, { photoUrl });
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2000);
+  const onSubmit = async (data: FormData) => {
+    const formData = new FormData();
+    formData.append('fullName', data.displayName);
+    formData.append('country', data.country);
+    formData.append('city', data.city);
+    if (photoFile) {
+      formData.append('profileImage', photoFile);
+    }
+
+    try {
+      await updateUser(formData).unwrap();
+      message.success('Profile updated successfully');
+      setSavedSuccess(true);
+      refetch(); // refresh user data
+      setTimeout(() => setSavedSuccess(false), 2000);
+    } catch (err: any) {
+      message.error(err?.data?.message || 'Failed to update profile');
+    }
   };
+
+  if (isLoadingUser) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -132,7 +176,7 @@ export function BasicSettingsPanel() {
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
           <input
             type="email"
-            defaultValue="bryanadams@gmail.com"
+            value={userData?.email || ''}
             disabled
             className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-400 bg-gray-100 cursor-not-allowed"
           />
@@ -185,16 +229,18 @@ export function BasicSettingsPanel() {
           </div>
         </div>
 
-        {/* Save */}
+        {/* Save Button */}
         <button
           type="submit"
-          className={`px-10 py-2.5 rounded-lg font-medium text-sm transition ${
+          disabled={isUpdating}
+          className={`px-10 py-2.5 rounded-lg font-medium text-sm transition flex items-center gap-2 ${
             savedSuccess
               ? 'bg-green-600 text-white'
               : 'bg-black text-white hover:bg-gray-800'
-          }`}
+          } disabled:opacity-70 disabled:cursor-not-allowed`}
         >
-          {savedSuccess ? 'Saved!' : 'Save'}
+          {isUpdating && <Loader2 className="animate-spin w-4 h-4" />}
+          {isUpdating ? 'Saving...' : savedSuccess ? 'Saved!' : 'Save'}
         </button>
       </form>
     </div>

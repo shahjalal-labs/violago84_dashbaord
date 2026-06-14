@@ -1,4 +1,5 @@
 import { baseApi } from "../../api/baseApi";
+import { UserProfile } from "../usersApi";
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -12,17 +13,14 @@ const authApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["user"],
     }),
-    // loginWithGoogle: builder.mutation({
-    //   query: (userInfo) => {
-    //     console.log({ userInfo });
-    //     return {
-    //       url: "google-login",
-    //       method: "POST",
-    //       body: userInfo,
-    //     };
-    //   },
-    //   invalidatesTags: ["user"],
-    // }),
+   changePassword: builder.mutation<UserProfile, { oldPassword: string; newPassword: string }>({
+  query: (data) => ({
+    url: '/auth/change-password',
+    method: 'PUT',
+    body: data,
+  }),
+  invalidatesTags: ['user'],
+}),
     forgotPassword: builder.mutation({
       query: (userInfo) => {
         console.log({ userInfo });
@@ -73,13 +71,7 @@ const authApi = baseApi.injectEndpoints({
         };
       },
     }),
-    getMe: builder.query({
-      query: () => ({
-        url: "user/me",
-        method: "GET",
-      }),
-      providesTags: ["user"],
-    }),
+ 
     // /auth/resend-otp
     resendOtp: builder.mutation({
       query: (userInfo) => {
@@ -91,13 +83,13 @@ const authApi = baseApi.injectEndpoints({
       },
     }),
   }),
-});
+}); 
 
 export const {
   useLoginMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useOtpMutation,
-  useGetMeQuery,
   useResendOtpMutation,
+  useChangePasswordMutation
 } = authApi;
