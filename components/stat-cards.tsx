@@ -1,3 +1,5 @@
+"use client"
+import { useGetUserDashboardCountsQuery } from '@/redux/features/usersApi';
 import { Users, CheckCircle2, XCircle } from 'lucide-react'
 
 interface StatCardProps {
@@ -27,12 +29,18 @@ function StatCard({ icon, label, value, bgColor, iconBgColor, textColor }: StatC
 }
 
 export function StatCards() {
+  const {data: userDashboardCounts, isLoading} = useGetUserDashboardCountsQuery(undefined)
+  console.log(userDashboardCounts);
+
+  if (isLoading){
+    return <div>Loading...</div>
+  }
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 px-4 md:px-8 py-6">
       <StatCard
         icon={<Users className="text-green-600" size={24} />}
         label="Total Users"
-        value={250}
+        value={userDashboardCounts?.totalUsers || 0}
         bgColor="bg-green-50"
         iconBgColor="bg-green-100"
         textColor="text-green-600"
@@ -40,7 +48,7 @@ export function StatCards() {
       <StatCard
         icon={<CheckCircle2 className="text-amber-600" size={24} />}
         label="Active Users"
-        value={232}
+        value={userDashboardCounts?.activeUsers || 0}
         bgColor="bg-amber-50"
         iconBgColor="bg-amber-100"
         textColor="text-amber-600"
@@ -48,7 +56,7 @@ export function StatCards() {
       <StatCard
         icon={<XCircle className="text-rose-600" size={24} />}
         label="Inactive Users"
-        value={18}
+        value={userDashboardCounts?.blockedUsers || 0}
         bgColor="bg-rose-50"
         iconBgColor="bg-rose-100"
         textColor="text-rose-600"

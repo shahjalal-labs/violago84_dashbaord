@@ -69,6 +69,11 @@ const usersApi = baseApi.injectEndpoints({
       transformResponse: (response: any) => response.data,
       providesTags: ['user'],
     }),
+    getUserDashboardCounts: builder.query({
+      query: () => '/users/user-dashboard-counts',
+      transformResponse: (response: any) => response.data,
+      providesTags: ['user'],
+    }),
     updateUser: builder.mutation<UserProfile, FormData>({
       query: (formData) => ({
         url: '/users/update-user',
@@ -86,5 +91,6 @@ export const {
   useGetSingleUserQuery,
   useBlockUnblockUserMutation,
   useGetMeQuery,
-  useUpdateUserMutation
+  useUpdateUserMutation,
+  useGetUserDashboardCountsQuery
 } = usersApi;
