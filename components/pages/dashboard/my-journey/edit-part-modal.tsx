@@ -84,8 +84,20 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
           </Upload>
           {previewUrl && (
             <div className="mt-2 flex justify-end">
-              <button onClick={handleRemove} className="text-xs text-red-500">Remove</button>
+             <button
+  type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleRemove();
+  }}
+  className="text-xs text-red-500"
+>
+  Remove
+</button>
             </div>
+
+            
           )}
         </Form.Item>
         <div className="flex justify-end gap-3 mt-6">
