@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -8,6 +9,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import Swal from "sweetalert2";
+import logo from "@/assets/images/logo.png";
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -107,8 +109,9 @@ export function Sidebar() {
         </button>
 
         {/* Logo */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center text-white text-2xl font-bold">🐺</div>
+        <div className="p-6 border-b border-gray-200 flex flex-col items-center">
+          {/* <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center text-white text-2xl font-bold">🐺</div> */}
+          <img src={logo.src} alt="logo" className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center text-white text-2xl font-bold" />
           <h1 className="mt-4 text-xl font-bold text-gray-900">My Shepherd</h1>
         </div>
 
