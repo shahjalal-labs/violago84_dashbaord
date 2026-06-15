@@ -11,6 +11,7 @@ import {
 } from '@/redux/features/usersApi';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentToken } from '@/redux/features/auth/authSlice';
+import { cn } from '@/lib/utils';
 
 interface User {
   id: string;
@@ -198,13 +199,13 @@ export function UsersTable() {
               <button
                 onClick={() => handleBlockUnblock(user.id, user.status)}
                 disabled={isBlocking}
-                className={`flex-1 p-2 rounded-lg transition flex items-center justify-center gap-2 ${
+                className={cn(`flex-1 p-2 rounded-lg transition flex items-center justify-center gap-2 ${
                   user.status === 'ACTIVE'
                     ? 'bg-red-100 text-red-600'
                     : 'bg-green-100 text-green-600'
                 },
                  ${isBlocking ? 'opacity-50 cursor-not-allowed' : ''}
-                `}
+                `)}
               >
                 {user.status === 'ACTIVE' ? <Ban size={16} /> : <CheckCircle size={16} />}
                 <span className="text-xs">{user.status === 'ACTIVE' ? 'Block' : 'Unblock'}</span>
