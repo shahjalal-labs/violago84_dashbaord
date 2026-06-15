@@ -66,7 +66,7 @@ export const journeyApi = baseApi.injectEndpoints({
       transformResponse: (response: any) => response.data,
       providesTags: (_result, _error, partId) => [{ type: "JourneyLesson", id: partId }],
     }),
-    createLesson: builder.mutation<JourneyLesson, FormData>({
+    createJourneyLesson: builder.mutation<JourneyLesson, FormData>({
       query: (formData) => ({
         url: "/journey/lessons",
         method: "POST",
@@ -74,7 +74,7 @@ export const journeyApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["JourneyPart", "JourneyLesson"],
     }),
-    updateLesson: builder.mutation<JourneyLesson, { id: string; formData: FormData }>({
+    updateJourneyLesson: builder.mutation<JourneyLesson, { id: string; formData: FormData }>({
       query: ({ id, formData }) => ({
         url: `/journey/lessons/${id}`,
         method: "PATCH",
@@ -82,7 +82,7 @@ export const journeyApi = baseApi.injectEndpoints({
       }),
      invalidatesTags: ["JourneyPart", "JourneyLesson"],
     }),
-    deleteLesson: builder.mutation<void, string>({
+    deleteJourneyLesson: builder.mutation<void, string>({
       query: (id) => ({
         url: `/journey/lessons/${id}`,
         method: "DELETE",
@@ -99,7 +99,7 @@ export const {
   useUpdatePartMutation,
   useDeletePartMutation,
   useGetLessonsByPartQuery,
-  useCreateLessonMutation,
-  useUpdateLessonMutation,
-  useDeleteLessonMutation,
+  useCreateJourneyLessonMutation,
+  useUpdateJourneyLessonMutation,
+  useDeleteJourneyLessonMutation,
 } = journeyApi;

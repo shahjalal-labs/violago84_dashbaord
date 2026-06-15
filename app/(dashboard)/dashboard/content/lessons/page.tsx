@@ -22,7 +22,7 @@ import { Plus } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 export default function LessonsPage() {
-  const { data: categories, isLoading, isFetching, refetch } = useGetAllCategoriesQuery();
+  const { data: categories, isLoading, isFetching, refetch } = useGetAllCategoriesQuery(undefined, );
   const [createCategory, { isLoading: isCreatingCategory }] = useCreateCategoryMutation();
   const [updateCategory, { isLoading: isUpdatingCategory }] = useUpdateCategoryMutation();
   const [deleteCategory, { isLoading: isDeletingCategory }] = useDeleteCategoryMutation();

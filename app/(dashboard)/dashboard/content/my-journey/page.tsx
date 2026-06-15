@@ -13,9 +13,9 @@ import {
   useCreatePartMutation,
   useUpdatePartMutation,
   useDeletePartMutation,
-  useCreateLessonMutation,
-  useUpdateLessonMutation,
-  useDeleteLessonMutation,
+  useCreateJourneyLessonMutation,
+  useUpdateJourneyLessonMutation,
+  useDeleteJourneyLessonMutation,
 } from '@/redux/features/journeyApi';
 import { message, Spin } from 'antd';
 import { Plus } from 'lucide-react';
@@ -26,9 +26,9 @@ export default function MyJourneyPage() {
   const [createPart, { isLoading: isCreatingPart }] = useCreatePartMutation();
   const [updatePart, { isLoading: isUpdatingPart }] = useUpdatePartMutation();
   const [deletePart, { isLoading: isDeletingPart }] = useDeletePartMutation();
-  const [createLesson, { isLoading: isCreatingLesson }] = useCreateLessonMutation();
-  const [updateLesson, { isLoading: isUpdatingLesson }] = useUpdateLessonMutation();
-  const [deleteLesson, { isLoading: isDeletingLesson }] = useDeleteLessonMutation();
+  const [createLesson, { isLoading: isCreatingLesson }] = useCreateJourneyLessonMutation();
+  const [updateLesson, { isLoading: isUpdatingLesson }] = useUpdateJourneyLessonMutation();
+  const [deleteLesson, { isLoading: isDeletingLesson }] = useDeleteJourneyLessonMutation();
 
   // Modal states
   const [isCreatePartOpen, setIsCreatePartOpen] = useState(false);
