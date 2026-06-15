@@ -199,10 +199,10 @@ export function UsersTable() {
               <button
                 onClick={() => handleBlockUnblock(user.id, user.status)}
                 disabled={isBlocking}
-                className={cn(`flex-1 p-2 rounded-lg transition flex items-center justify-center gap-2 ${
+                className={cn(`flex-1 p-2 rounded-lg transition flex items-center justify-center gap-2 text-black ${
                   user.status === 'ACTIVE'
-                    ? 'bg-red-100 text-red-600'
-                    : 'bg-green-100 text-green-600'
+                    ? 'bg-red-100 '
+                    : 'bg-green-100 '
                 },
                  ${isBlocking ? 'opacity-50 cursor-not-allowed' : ''}
                 `)}
