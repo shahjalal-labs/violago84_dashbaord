@@ -217,6 +217,7 @@ export default function MyJourneyPage() {
 
       {/* Create Part Modal */}
       <CreatePartModal
+        partNumber={parts?.length ? parts[parts.length - 1].partNumber + 1 : 1}
         open={isCreatePartOpen}
         onClose={() => setIsCreatePartOpen(false)}
         onSubmit={handleCreatePart}

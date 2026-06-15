@@ -6,17 +6,18 @@ import { useState } from 'react';
 import type { RcFile } from 'antd/es/upload/interface';
 
 interface CreatePartModalProps {
+  partNumber: number | null | undefined;
   open: boolean;
   onClose: () => void;
   onSubmit: (formData: FormData) => void;
 }
 
-export function CreatePartModal({ open, onClose, onSubmit }: CreatePartModalProps) {
+export function CreatePartModal({ partNumber, open, onClose, onSubmit }: CreatePartModalProps) {
   const [form] = Form.useForm();
   const [file, setFile] = useState<RcFile | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
-
+console.log(partNumber);
   const handleFinish = async (values: { partNumber: number; title?: string }) => {
     const formData = new FormData();
     formData.append('partNumber', values.partNumber.toString());
@@ -61,9 +62,9 @@ export function CreatePartModal({ open, onClose, onSubmit }: CreatePartModalProp
 
   return (
     <Modal title="Create New Part" open={open} onCancel={onClose} footer={null} width={600} destroyOnClose centered>
-      <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={{ partNumber: 1 }}>
-        <Form.Item name="partNumber" label="Part Number" rules={[{ required: true, message: 'Part number is required' }]}>
-          <Input type="number" min={1} />
+      <Form form={form} layout="vertical" onFinish={handleFinish}  initialValues={{ partNumber }}>
+        <Form.Item name="partNumber" label="Part Number"  rules={[{ required: true, message: 'Part number is required' }]}>
+          <Input type="number" min={1} defaultValue={partNumber} />
         </Form.Item>
         <Form.Item name="title" label="Part Title (optional)">
           <Input placeholder="e.g., Puppy Basics" />

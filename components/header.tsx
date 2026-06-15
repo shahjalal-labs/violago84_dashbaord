@@ -1,5 +1,6 @@
 "use client"
 
+import { useGetMeQuery } from "@/redux/features/usersApi";
 import Link from "next/link";
 
 interface HeaderProps {
@@ -7,16 +8,23 @@ interface HeaderProps {
 }
 
 export function Header({ title = 'Users Management' }: HeaderProps) {
+  const { data: userData, isLoading: isLoadingUser } = useGetMeQuery();
+   if(isLoadingUser) return <div>Loading...</div>
+  console.log(userData?.profileImage);
   return (
     <header className="flex items-center justify-between px-4 md:px-8 py-6 bg-white border-b border-gray-200">
-      
+
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 hidden lg:block">{title}</h1>
       </div>
       <Link href="/dashboard/settings" >
-      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:shadow-lg transition">
-        👤
-      </div>
+
+        {userData?.profileImage ?
+          <img src={userData?.profileImage} alt="Profile" className="w-10 h-10 md:w-12 md:h-12 rounded-full" /> : 
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:shadow-lg transition">
+            👤
+          </div>
+        }
       </Link>
     </header>
   )
