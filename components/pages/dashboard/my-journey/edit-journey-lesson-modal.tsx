@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Modal, Form, Input, Upload, message } from 'antd';
@@ -16,6 +17,7 @@ export function EditJourneyLessonModal({ open, lesson, onClose, onSubmit }: Edit
   const [form] = Form.useForm();
   const [file, setFile] = useState<RcFile | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [removeExisting, setRemoveExisting] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export function EditJourneyLessonModal({ open, lesson, onClose, onSubmit }: Edit
       form.setFieldsValue({ title: lesson.title, description: lesson.description || '' });
       setPreviewUrl(lesson.imageUrl || '');
       setFile(null);
+      setRemoveExisting(false);
     }
   }, [lesson, form]);
 
@@ -30,7 +33,11 @@ export function EditJourneyLessonModal({ open, lesson, onClose, onSubmit }: Edit
     const formData = new FormData();
     formData.append('title', values.title);
     if (values.description) formData.append('description', values.description);
-    if (file) formData.append('image', file);
+    if (file) {
+      formData.append('image', file);
+    } else if (removeExisting) {
+      formData.append('removeImage', 'true');
+    }
     setLoading(true);
     try {
       await onSubmit(formData);
@@ -47,9 +54,18 @@ export function EditJourneyLessonModal({ open, lesson, onClose, onSubmit }: Edit
       message.error('Only image files are allowed');
       return false;
     }
+    if (previewUrl && previewUrl !== lesson?.imageUrl) URL.revokeObjectURL(previewUrl);
     setFile(uploadedFile);
     setPreviewUrl(URL.createObjectURL(uploadedFile));
+    setRemoveExisting(false);
     return false;
+  };
+
+  const handleRemove = () => {
+    if (previewUrl && previewUrl !== lesson?.imageUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl('');
+    setRemoveExisting(true);
   };
 
   const uploadButton = (
@@ -78,7 +94,7 @@ export function EditJourneyLessonModal({ open, lesson, onClose, onSubmit }: Edit
           </Upload>
           {previewUrl && (
             <div className="mt-2 flex justify-end">
-              <button onClick={() => { if (previewUrl !== lesson?.imageUrl) URL.revokeObjectURL(previewUrl); setFile(null); setPreviewUrl(lesson?.imageUrl || ''); }} className="text-xs text-red-500">Remove</button>
+              <button type="button" onClick={handleRemove} className="text-xs text-red-500">Remove</button>
             </div>
           )}
         </Form.Item>

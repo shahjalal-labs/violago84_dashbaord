@@ -16,6 +16,7 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
   const [form] = Form.useForm();
   const [file, setFile] = useState<RcFile | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [removeExisting, setRemoveExisting] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
       form.setFieldsValue({ partNumber: part.partNumber, title: part.title || '' });
       setPreviewUrl(part.imageUrl || '');
       setFile(null);
+      setRemoveExisting(false);
     }
   }, [part, form]);
 
@@ -30,7 +32,11 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
     const formData = new FormData();
     formData.append('partNumber', values.partNumber.toString());
     if (values.title) formData.append('title', values.title);
-    if (file) formData.append('image', file);
+    if (file) {
+      formData.append('image', file);
+    } else if (removeExisting) {
+      formData.append('removeImage', 'true');
+    }
     setLoading(true);
     try {
       await onSubmit(formData);
@@ -47,15 +53,18 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
       message.error('Only image files are allowed');
       return false;
     }
+    if (previewUrl && previewUrl !== part?.imageUrl) URL.revokeObjectURL(previewUrl);
     setFile(uploadedFile);
     setPreviewUrl(URL.createObjectURL(uploadedFile));
+    setRemoveExisting(false);
     return false;
   };
 
   const handleRemove = () => {
     if (previewUrl && previewUrl !== part?.imageUrl) URL.revokeObjectURL(previewUrl);
     setFile(null);
-    setPreviewUrl(part?.imageUrl || '');
+    setPreviewUrl('');
+    setRemoveExisting(true);
   };
 
   const uploadButton = (
@@ -84,20 +93,14 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
           </Upload>
           {previewUrl && (
             <div className="mt-2 flex justify-end">
-             <button
-  type="button"
-  onClick={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleRemove();
-  }}
-  className="text-xs text-red-500"
->
-  Remove
-</button>
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="text-xs text-red-500"
+              >
+                Remove
+              </button>
             </div>
-
-            
           )}
         </Form.Item>
         <div className="flex justify-end gap-3 mt-6">
