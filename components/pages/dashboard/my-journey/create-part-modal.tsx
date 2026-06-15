@@ -17,7 +17,7 @@ export function CreatePartModal({ partNumber, open, onClose, onSubmit }: CreateP
   const [file, setFile] = useState<RcFile | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
-console.log(partNumber);
+
   const handleFinish = async (values: { partNumber: number; title?: string }) => {
     const formData = new FormData();
     formData.append('partNumber', values.partNumber.toString());
