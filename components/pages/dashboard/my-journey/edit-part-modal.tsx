@@ -83,6 +83,9 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
         <Form.Item name="title" label="Part Title (optional)">
           <Input placeholder="e.g., Puppy Basics" />
         </Form.Item>
+          <Form.Item name="description" label="Description (optional)">
+          <Input.TextArea rows={4} placeholder="Write a short description..." />
+        </Form.Item>
         <Form.Item label="Image (optional)">
           <Upload listType="picture-card" showUploadList={false} beforeUpload={beforeUpload} maxCount={1}>
             {previewUrl ? (

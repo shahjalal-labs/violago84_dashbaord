@@ -62,12 +62,15 @@ export function CreatePartModal({ partNumber, open, onClose, onSubmit }: CreateP
 
   return (
     <Modal title="Create New Part" open={open} onCancel={onClose} footer={null} width={600} destroyOnClose centered>
-      <Form form={form} layout="vertical" onFinish={handleFinish}  initialValues={{ partNumber }}>
-        <Form.Item name="partNumber" label="Part Number"  rules={[{ required: true, message: 'Part number is required' }]}>
-          <Input type="number" min={1}  />
+      <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={{ partNumber }}>
+        <Form.Item name="partNumber" label="Part Number" rules={[{ required: true, message: 'Part number is required' }]}>
+          <Input type="number" min={1} />
         </Form.Item>
         <Form.Item name="title" label="Part Title (optional)">
           <Input placeholder="e.g., Puppy Basics" />
+        </Form.Item>
+        <Form.Item name="description" label="Description (optional)">
+          <Input.TextArea rows={4} placeholder="Write a short description..." />
         </Form.Item>
         <Form.Item label="Image (optional)">
           <Upload listType="picture-card" showUploadList={false} beforeUpload={beforeUpload} maxCount={1}>
