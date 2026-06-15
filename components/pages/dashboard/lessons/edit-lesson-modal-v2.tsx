@@ -2,12 +2,13 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { Modal, Form, Input, message } from 'antd';
+import { Modal, Form, Input, Upload, message } from 'antd';
+import { PlusOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useState, useEffect, useRef } from 'react';
-import { Upload } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import type { RcFile } from 'antd/es/upload/interface';
 
 const editSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -22,9 +23,10 @@ interface EditLessonModalV2Props {
 }
 
 export function EditLessonModalV2({ open, lesson, onClose, onSubmit }: EditLessonModalV2Props) {
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<RcFile | null>(null);
   const [preview, setPreview] = useState<string>('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [removeExisting, setRemoveExisting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(editSchema),
@@ -32,54 +34,75 @@ export function EditLessonModalV2({ open, lesson, onClose, onSubmit }: EditLesso
   });
 
   useEffect(() => {
-    let t: number | undefined;
     if (lesson) {
       setValue('title', lesson.title);
       setValue('description', lesson.description || '');
-      t = window.setTimeout(() => {
-        setPreview(lesson.imageUrl || lesson.thumbnail || '');
-      }, 0);
+      setPreview(lesson.imageUrl || lesson.thumbnail || '');
+      setThumbnailFile(null);
+      setRemoveExisting(false);
     } else {
       reset();
-      t = window.setTimeout(() => {
-        setPreview('');
-      }, 0);
+      setPreview('');
+      setThumbnailFile(null);
+      setRemoveExisting(false);
     }
-    return () => {
-      if (t) clearTimeout(t);
-    };
   }, [lesson, setValue, reset]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        message.error('Only image files');
-        return;
-      }
-      setThumbnailFile(file);
-      setPreview(URL.createObjectURL(file));
+  const existingUrl = lesson?.imageUrl || lesson?.thumbnail || '';
+
+  const beforeUpload = (file: RcFile) => {
+    if (!file.type.startsWith('image/')) {
+      message.error('Only image files are allowed');
+      return false;
     }
+    if (preview && preview !== existingUrl) URL.revokeObjectURL(preview);
+    setThumbnailFile(file);
+    setPreview(URL.createObjectURL(file));
+    setRemoveExisting(false);
+    return false;
   };
 
-  const handleFormSubmit = (data: any) => {
+  const handleRemove = () => {
+    if (preview && preview !== existingUrl) URL.revokeObjectURL(preview);
+    setThumbnailFile(null);
+    setPreview('');
+    setRemoveExisting(true);
+  };
+
+  const handleFormSubmit = async (data: any) => {
     const formData = new FormData();
     formData.append('title', data.title);
     if (data.description) formData.append('description', data.description);
-    if (thumbnailFile) formData.append('thumbnail', thumbnailFile);
-    onSubmit(formData);
-    reset();
-    setThumbnailFile(null);
-    setPreview('');
-    onClose();
+    if (thumbnailFile) {
+      formData.append('thumbnail', thumbnailFile);
+    } else if (removeExisting) {
+      formData.append('removeThumbnail', 'true');
+    }
+    setLoading(true);
+    try {
+      await onSubmit(formData);
+      handleClose();
+    } catch (err) {
+      message.error('Failed to update lesson');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
     reset();
     setThumbnailFile(null);
     setPreview('');
+    setRemoveExisting(false);
     onClose();
   };
+
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
 
   return (
     <Modal
@@ -92,20 +115,18 @@ export function EditLessonModalV2({ open, lesson, onClose, onSubmit }: EditLesso
     >
       <Form layout="vertical" onFinish={handleSubmit(handleFormSubmit)} className="mt-4">
         <Form.Item label="Thumbnail">
-          <div
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full h-36 border border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-gray-50 transition overflow-hidden"
-          >
+          <Upload listType="picture-card" showUploadList={false} beforeUpload={beforeUpload} maxCount={1}>
             {preview ? (
-              <img src={preview} alt="preview" className="w-full h-full object-cover" />
+              <img src={preview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <>
-                <Upload size={28} className="text-gray-400" />
-                <span className="text-sm text-gray-400">Click to upload</span>
-              </>
+              uploadButton
             )}
-          </div>
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+          </Upload>
+          {preview && (
+            <div className="mt-2 flex justify-end">
+              <button type="button" onClick={handleRemove} className="text-xs text-red-500">Remove</button>
+            </div>
+          )}
         </Form.Item>
 
         <Controller
@@ -128,14 +149,15 @@ export function EditLessonModalV2({ open, lesson, onClose, onSubmit }: EditLesso
           )}
         />
 
-        <Form.Item className="flex justify-end gap-3 mb-0 mt-4">
+        <div className="flex justify-end gap-2 mb-0 mt-4 items-center">
           <button type="button" onClick={handleClose} className="px-6 py-2.5 border rounded-lg me-3">
             Cancel
           </button>
-          <button type="submit" className="px-6 py-2.5 bg-black text-white rounded-lg">
-            Update
+          <button type="submit" disabled={loading} className="px-6 py-2.5 bg-black text-white rounded-lg flex items-center gap-2">
+            {loading && <LoadingOutlined className="animate-spin" />}
+            {loading ? 'Updating...' : 'Update'}
           </button>
-        </Form.Item>
+        </div>
       </Form>
     </Modal>
   );
