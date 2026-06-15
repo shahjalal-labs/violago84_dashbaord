@@ -7,7 +7,7 @@ import type { RcFile } from 'antd/es/upload/interface';
 
 interface EditPartModalProps {
   open: boolean;
-  part: { id: string; partNumber: number; title?: string; imageUrl?: string } | null;
+  part: { id: string; partNumber: number; title?: string; description?: string; imageUrl?: string  } | null;
   onClose: () => void;
   onSubmit: (formData: FormData) => void;
 }
@@ -21,17 +21,18 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
 
   useEffect(() => {
     if (part) {
-      form.setFieldsValue({ partNumber: part.partNumber, title: part.title || '' });
+      form.setFieldsValue({ partNumber: part.partNumber, title: part.title || '', description: part.description || '' });
       setPreviewUrl(part.imageUrl || '');
       setFile(null);
       setRemoveExisting(false);
     }
   }, [part, form]);
 
-  const handleFinish = async (values: { partNumber: number; title?: string }) => {
+  const handleFinish = async (values: { partNumber: number; title?: string; description?: string }) => {
     const formData = new FormData();
     formData.append('partNumber', values.partNumber.toString());
     if (values.title) formData.append('title', values.title);
+    if (values.description) formData.append('description', values.description);
     if (file) {
       formData.append('image', file);
     } else if (removeExisting) {
@@ -83,7 +84,7 @@ export function EditPartModal({ open, part, onClose, onSubmit }: EditPartModalPr
         <Form.Item name="title" label="Part Title (optional)">
           <Input placeholder="e.g., Puppy Basics" />
         </Form.Item>
-          <Form.Item name="description" label="Description (optional)">
+        <Form.Item name="description" label="Description (optional)">
           <Input.TextArea rows={4} placeholder="Write a short description..." />
         </Form.Item>
         <Form.Item label="Image (optional)">

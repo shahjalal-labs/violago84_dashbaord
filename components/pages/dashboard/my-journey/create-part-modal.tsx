@@ -18,10 +18,11 @@ export function CreatePartModal({ partNumber, open, onClose, onSubmit }: CreateP
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
-  const handleFinish = async (values: { partNumber: number; title?: string }) => {
+  const handleFinish = async (values: { partNumber: number; title?: string; description?: string }) => {
     const formData = new FormData();
     formData.append('partNumber', values.partNumber.toString());
     if (values.title) formData.append('title', values.title);
+    if (values.description) formData.append('description', values.description);
     if (file) formData.append('image', file);
     setLoading(true);
     try {

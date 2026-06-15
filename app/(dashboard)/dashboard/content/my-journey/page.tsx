@@ -39,7 +39,7 @@ export default function MyJourneyPage() {
   const [selectedLesson, setSelectedLesson] = useState<any>(null);
   const [selectedPartId, setSelectedPartId] = useState<string>('');
   const [createLessonTitle, setCreateLessonTitle] = useState('');
-
+console.log(selectedPart);
   // Track loading for individual deletions
   const [deletingPartId, setDeletingPartId] = useState<string | null>(null);
   const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null);
@@ -54,6 +54,7 @@ export default function MyJourneyPage() {
 
   // Part handlers
   const handleCreatePart = async (formData: FormData) => {
+    console.log(formData);
     try {
       await createPart(formData).unwrap();
       message.success('Part created');
