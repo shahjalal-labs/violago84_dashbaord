@@ -64,7 +64,7 @@ console.log(partNumber);
     <Modal title="Create New Part" open={open} onCancel={onClose} footer={null} width={600} destroyOnClose centered>
       <Form form={form} layout="vertical" onFinish={handleFinish}  initialValues={{ partNumber }}>
         <Form.Item name="partNumber" label="Part Number"  rules={[{ required: true, message: 'Part number is required' }]}>
-          <Input type="number" min={1} defaultValue={partNumber} />
+          <Input type="number" min={1}  />
         </Form.Item>
         <Form.Item name="title" label="Part Title (optional)">
           <Input placeholder="e.g., Puppy Basics" />
