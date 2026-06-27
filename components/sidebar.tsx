@@ -37,6 +37,7 @@ export function Sidebar() {
         { label: "My Journey", href: "/dashboard/content/my-journey" },
         { label: "Lessons", href: "/dashboard/content/lessons" },
         { label: "Playing Game", href: "/dashboard/content/game" },
+        { label: "FAQs", href: "/dashboard/content/faq" },
       ],
     },
     { icon: BarChart3, label: "Progress Viewer", href: "/dashboard/progress", id: "progress" },
